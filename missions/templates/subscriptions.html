@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <title>Мої підписки</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <h1>Мої підписки</h1>
+        {% for subscription in subscriptions %}
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">{{ subscription.mission.name }}</h2>
+            <p class="card-text">
+              Дата запуску: {{ subscription.mission.launch_date }}
+            </p>
+            <p class="card-text">
+              flight number: {{ subscription.mission.country }}
+            </p>
+            <p class="card-text">
+              Тип місії: {{ subscription.mission.mission_type }}
+            </p>
+            {% if subscription.mission.missiondetail %}
+            <p class="card-text">Додаткова інформація:</p>
+            {% if subscription.mission.missiondetail.youtube_link %}
+            <p class="card-text">
+              YouTube посилання:
+              <a
+                target="_blank"
+                href="{{ subscription.mission.missiondetail.youtube_link }}"
+                >{{ subscription.mission.missiondetail.youtube_link }}</a
+              >
+            </p>
+            {% endif %} {% if subscription.mission.missiondetail.reddit_link %}
+            <p class="card-text">
+              Reddit посилання:
+              <a
+                target="_blank"
+                href="{{ subscription.mission.missiondetail.reddit_link }}"
+                >{{ subscription.mission.missiondetail.reddit_link }}</a
+              >
+            </p>
+            {% endif %} {% if subscription.mission.missiondetail.image_link %}
+            <p class="card-text">Зображення:</p>
+            <img
+              class="img-fluid"
+              src="{{ subscription.mission.missiondetail.image_link }}"
+              alt="Mission Image"
+            />
+            {% endif %} {% else %}
+            <p class="card-text">Немає додаткової інформації про цю місію</p>
+            {% endif %}
+            <form
+              v-if="unsubscribe"
+              class="unsubscribe-form"
+              @submit.prevent="submitForm('{{ subscription.mission.id }}', 'unsubscribe')"
+              action="/unsubscribe/{{ mission.id }}/"
+            >
+              {% csrf_token %}
+              <input
+                type="hidden"
+                name="csrfmiddlewaretoken"
+                value="{{ csrf_token }}"
+              />
+              <button type="submit" class="btn btn-primary">Відписатися</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> -->
+    <script src="https://unpkg.com/vue@2.6.12"></script>
+    <script src="https://unpkg.com/vue-resource@1.5.1"></script>
+    {% load static %}
+    <script src="{% static 'js/subscribe.js' %}"></script>
+  </body>
+</html>

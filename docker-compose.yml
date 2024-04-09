@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  # Сервіс Django додатку
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:1@db:5432/CourseProject
+    command: sh -c "sleep 10 && python manage.py runserver 0.0.0.0:8000"
+    restart: "on-failure"
+
+  # Сервіс PostgreSQL
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    environment:
+      - POSTGRES_DB=CourseProject
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          {% if user.is_authenticated %}
+          <h3>Вітаємо, {{ user.username }}!</h3>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <strong><a href="{% url 'subscriptions' %}">Підписки</a></strong>
+            <button type="submit" class="btn btn-primary">Logout</button>
+          </form>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary mr-3">Увійти</a>
+          <a href="{% url 'signup' %}" class="btn btn-primary"
+            >Зареєструватися</a
+          >
+          {% endif %}
+        </nav>
+        {% if user.is_authenticated %}
+        <form method="GET" class="form-inline my-2 my-lg-0">
+          <input
+            class="form-control mr-sm-2"
+            type="text"
+            name="search"
+            placeholder="Search"
+          />
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+            Search
+          </button>
+        </form>
+        {% endif %} {% for mission in missions %}
+        <div class="card">
+          <div class="card-body">
+            <h2 class="card-title">{{ mission.name }}</h2>
+            {% if user.is_authenticated %}
+            <p class="card-text">{{ mission.launch_date }}</p>
+            <p class="card-text">flight number: {{ mission.country }}</p>
+            {% endif %}
+            <p class="card-text">rocket: {{ mission.mission_type }}</p>
+            <form
+              v-if="subscribe"
+              class="subscribe-form"
+              @submit.prevent="submitForm('{{ mission.id }}', 'subscribe')"
+              action="/subscribe/{{ mission.id }}/"
+            >
+              {% csrf_token %}
+              <input
+                type="hidden"
+                name="csrfmiddlewaretoken"
+                value="{{ csrf_token }}"
+              />
+              <button type="submit" class="btn btn-primary">Підписатися</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> -->
+    <script src="https://unpkg.com/vue@2.6.12"></script>
+    <script src="https://unpkg.com/vue-resource@1.5.1"></script>
+
+    {% load static %}
+    <script src="{% static 'js/subscribe.js' %}"></script>
+  </body>
+</html>
